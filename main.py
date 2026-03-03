@@ -4,6 +4,9 @@ from sqlalchemy.sql import func
 
 app = Flask(__name__)
 solves = []
+login = False
+
+
 @app.route("/",methods=['GET','POST'])
 def postInfo():
     
@@ -17,7 +20,14 @@ def postInfo():
         }
 
         solves.append( str(solve["solveNumber"]) + ": " + solve["scramble"] + " | " + str(solve["time"]) + "s" )
-    return render_template('index.html',solves=solves)
+        return render_template('index.html',solves=solves)
+    else:
+        if not login:
+            return render_template('login.html')
+        else:
+            return render_template('index.html')
+
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
