@@ -1,33 +1,24 @@
-from flask import Flask,render_template,request
+from flask import Flask,render_template,request,redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.sql import func
 
 app = Flask(__name__)
 solves = []
-login = False
 
 
-@app.route("/",methods=['GET','POST'])
-def postInfo():
+@app.route("/",methods=["GET","POST"])
+def home():
     
     if request.method == 'POST':
-        data = request.get_json()
-
-        solve={
-            "solveNumber":data["solveNumber"],
-            "scramble":data["scramble"],
-            "time":data["time"]
-        }
-
-        solves.append( str(solve["solveNumber"]) + ": " + solve["scramble"] + " | " + str(solve["time"]) + "s" )
-        return render_template('index.html',solves=solves)
+        return "<p> You posted < /p>"
     else:
-        if not login:
-            return render_template('login.html')
-        else:
-            return render_template('index.html')
+        return redirect(url_for('login'))
+        # else:
+        #     return render_template('index.html')
 
-    
+@app.route("/login",methods=["GET","POST"])
+def login():
+        return render_template('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
