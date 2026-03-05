@@ -22,7 +22,12 @@ def login():
 
 @app.route("/createacct",methods=["GET","POST"])
 def createacct():
-    print("rendering account creation page")
-    return render_template('createaccount.html')
+    if request.method=="POST":
+        print('',end='')
+    else:
+        print("rendering account creation page")
+        return render_template('createaccount.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
