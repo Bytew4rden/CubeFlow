@@ -1,17 +1,20 @@
 from flask import Flask,render_template,request,redirect,url_for
 import sqlite3
+import bcrypt 
 
 app = Flask(__name__)
 database = 'cubeflow.db'
 
-createTablesQuery = """
+createUsersTableQuery = """
 CREATE TABLE IF NOT EXISTS users
 (
-user_id INTEGER PRIMARY KEY AUTOINCREMENT,
+user_id INTEGER PRIMARY KEY,
 username TEXT UNIQUE NOT NULL,
 password TEXT NOT NULL
 );
+"""
 
+createSolvesTableQuery = """
 CREATE TABLE IF NOT EXISTS solves
 (
 solve_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,19 +24,45 @@ user_id INTEGER NOT NULL,
 FOREIGN KEY (user_id) REFERENCES users(user_id) 
 );
 """
+
 conn = sqlite3.connect(database)
 cur = conn.cursor()
-cur.execute(createTablesQuery)
+cur.execute(createUsersTableQuery)
+cur.execute(createSolvesTableQuery)
 conn.close()
 
 # Auth "Blueprint" Routes #
 @app.route("/",methods=["GET","POST"])
-def home():
-    print("Connected user not logged in, redirecting to login page.")
+def landing():
     return redirect(url_for('login'))
 
 @app.route("/login",methods=["GET","POST"])
 def login():
+    if request.method=="POST":
+        username = request.form.get('un')
+        password = request.form.get('pw')
+
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+
+        query = "SELECT username, password FROM users WHERE username = ?"
+        cur.execute(query,(username,))
+
+        result = cur.fetchone()
+
+        if result:
+            password_bytes = password.encode('utf-8')
+            hashed = result['password']
+
+            if bcrypt.checkpw(password_bytes,hashed):
+                return redirect(url_for('home'))
+            else:
+                return render_template('login.html')
+
+        else:
+            return render_template('login.html')
+
+
     return render_template('login.html')
 
 @app.route("/register",methods=["GET","POST"])
@@ -52,13 +81,19 @@ def register():
             conn.close()
             return render_template('register.html')
         else:
-            query = f'INSERT INTO users(username,password) VALUES ({username},{password})'
-            cur.execute(query)
+            password_bytes = password.encode('utf-8')
+            hashed_password = bcrypt.hashpw(password_bytes,bcrypt.gensalt())
+            query = 'INSERT INTO users(username,password) VALUES (?,?)'
+            cur.execute(query,(username, hashed_password))
             conn.close()
-            return 
+            print("account made")
+            return render_template('login.html')
     else:
         return render_template('register.html')
 
+@app.route("/home")
+def home():
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
