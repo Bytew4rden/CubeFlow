@@ -52,9 +52,10 @@ def login():
 
         if result:
             password_bytes = password.encode('utf-8')
-            hashed = result['password']
+            hashed = result[1]
 
             if bcrypt.checkpw(password_bytes,hashed):
+                print("password accepted")
                 return redirect(url_for('home'))
             else:
                 return render_template('login.html')
@@ -85,9 +86,10 @@ def register():
             hashed_password = bcrypt.hashpw(password_bytes,bcrypt.gensalt())
             query = 'INSERT INTO users(username,password) VALUES (?,?)'
             cur.execute(query,(username, hashed_password))
+            conn.commit()
             conn.close()
             print("account made")
-            return render_template('login.html')
+            return redirect(url_for('login'))
     else:
         return render_template('register.html')
 
@@ -96,4 +98,4 @@ def home():
     return render_template('index.html')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0')
