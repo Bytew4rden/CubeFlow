@@ -33,8 +33,10 @@ cur.execute(createSolvesTableQuery)
 conn.close()
 
 # Auth "Blueprint" Routes #
-@app.route("/",methods=["GET","POST"])
+@app.route("/")
 def landing():
+    if session.get("logged_in") == True:
+        return redirect(url_for('home'))
     return redirect(url_for('login'))
 
 @app.route("/login",methods=["GET","POST"])
