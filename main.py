@@ -1,8 +1,9 @@
-from flask import Flask,render_template,request,redirect,url_for
+from flask import Flask,render_template,request,redirect,url_for,session
 import sqlite3
 import bcrypt 
 
 app = Flask(__name__)
+app.secret_key = 'Lily_Eats_Birds'
 database = 'cubeflow.db'
 
 createUsersTableQuery = """
@@ -55,7 +56,10 @@ def login():
             hashed = result[1]
 
             if bcrypt.checkpw(password_bytes,hashed):
+
                 print("password accepted")
+                session["logged_in"] = True
+
                 return redirect(url_for('home'))
             else:
                 return render_template('login.html')
@@ -68,16 +72,20 @@ def login():
 
 @app.route("/register",methods=["GET","POST"])
 def register():
+
     if request.method=="POST":
         username = request.form.get('un')
         password = request.form.get('pw')
 
+        #Check if account exists already
         query = 'SELECT username FROM users WHERE username = ?'
         conn=sqlite3.connect(database)
         cur=conn.cursor()
         cur.execute(query,(username,))
         result = cur.fetchone()
         
+        #If an account with that username exists already, return the registration page again
+        # If not, your account is added to the DB, and you get taken to the login page.
         if result:
             conn.close()
             return render_template('register.html')
@@ -95,7 +103,10 @@ def register():
 
 @app.route("/home")
 def home():
-    return render_template('index.html')
+    if session.get("logged_in") == True:
+        return render_template('index.html')
+    else:
+        return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
