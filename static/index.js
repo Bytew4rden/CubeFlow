@@ -1,9 +1,3 @@
-var numSolves = 1;
-
-function incrSolves() {
-  numSolves++;
-}
-
 function generateScramble() {
   let scramble = document.getElementById("scramble");
 
@@ -60,22 +54,35 @@ function toggleTimer() {
     timerInterval = null;
 
     let scramble = document.getElementById("scramble").textContent;
-    let data = String(
-      numSolves + ": " + scramble + " | Time:" + timer.textContent + "s",
-    );
 
-    solves.push(timer.textContent);
+    //This 'data' variable is what's getting sent to the backend
+    const data = {
+      scramble: String(scramble),
+      time: String(timer.textContent),
+    };
 
-    let solveDiv = document.getElementById("solves");
-
-    let newSolveDiv = document.createElement("div");
-
-    newSolveDiv.textContent = data;
-
-    solveDiv.appendChild(newSolveDiv);
-
-    incrSolves();
+    //reset UI, generating a new scramble
     timer.textContent = 0;
     generateScramble();
+
+    sendSolveToDB(data);
+  }
+}
+
+async function sendSolveToDB(data) {
+  try {
+    const response = await fetch("/solve", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      throw new Error("Server sent an error");
+    }
+  } catch (error) {
+    console.error("POST to /solve failure");
   }
 }

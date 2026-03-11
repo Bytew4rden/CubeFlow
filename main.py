@@ -107,6 +107,16 @@ def home():
         return render_template('index.html')
     else:
         return redirect(url_for('login'))
+    
+@app.route("/solve",methods=["GET","POST"])
+def solve():
+    if request.method == "POST":
+        print("posted to /solve")
+        return "<h1>posted to /solve</h1>"
+    else:
+        print("get from /solve")
+        return "<h1>get from /solve</h1>"
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
