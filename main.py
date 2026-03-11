@@ -1,9 +1,12 @@
-from flask import Flask,render_template,request,redirect,url_for,session
+from flask import Flask,render_template,request,redirect,url_for,session,jsonify
 import sqlite3
 import bcrypt 
+from dotenv import load_dotenv, dotenv_values
 
+config = dotenv_values(".env")
 app = Flask(__name__)
-app.secret_key = 'Lily_Eats_Birds'
+
+app.secret_key = config['secret_key']
 database = 'cubeflow.db'
 
 createUsersTableQuery = """
@@ -18,9 +21,10 @@ password TEXT NOT NULL
 createSolvesTableQuery = """
 CREATE TABLE IF NOT EXISTS solves
 (
-solve_id INTEGER PRIMARY KEY AUTOINCREMENT,
-time_seconds REAL NOT NULL,
+solve_id INTEGER PRIMARY KEY,
 scramble TEXT,
+time_seconds REAL NOT NULL,
+penalty TEXT,
 user_id INTEGER NOT NULL,
 FOREIGN KEY (user_id) REFERENCES users(user_id) 
 );
@@ -48,18 +52,19 @@ def login():
         conn = sqlite3.connect(database)
         cur = conn.cursor()
 
-        query = "SELECT username, password FROM users WHERE username = ?"
+        query = "SELECT user_id, username, password FROM users WHERE username = ?"
         cur.execute(query,(username,))
 
         result = cur.fetchone()
 
         if result:
             password_bytes = password.encode('utf-8')
-            hashed = result[1]
+            hashed = result[2]
 
             if bcrypt.checkpw(password_bytes,hashed):
 
                 print("password accepted")
+                session["user_id"] = result[0]
                 session["logged_in"] = True
 
                 return redirect(url_for('home'))
@@ -113,8 +118,18 @@ def home():
 @app.route("/solve",methods=["GET","POST"])
 def solve():
     if request.method == "POST":
-        print("posted to /solve")
-        return "<h1>posted to /solve</h1>"
+        # Upload solve into DB
+        query = """
+        INSERT INTO solves(time_seconds,scramble,user_id) VALUES (?,?,?)
+        """
+        solveData = request.get_json()
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(query,(solveData["time"],solveData["scramble"],session["user_id"],))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({"status":"success","message":"Solve recorded"}),200
     else:
         print("get from /solve")
         return "<h1>get from /solve</h1>"

@@ -65,11 +65,11 @@ function toggleTimer() {
     timer.textContent = 0;
     generateScramble();
 
-    sendSolveToDB(data);
+    sendDataToBackend(data);
   }
 }
 
-async function sendSolveToDB(data) {
+async function sendDataToBackend(data) {
   try {
     const response = await fetch("/solve", {
       method: "POST",
@@ -78,10 +78,6 @@ async function sendSolveToDB(data) {
       },
       body: JSON.stringify(data),
     });
-
-    if (!response.ok) {
-      throw new Error("Server sent an error");
-    }
   } catch (error) {
     console.error("POST to /solve failure");
   }
