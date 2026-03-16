@@ -36,6 +36,7 @@ cur.execute(createUsersTableQuery)
 cur.execute(createSolvesTableQuery)
 conn.close()
 
+@app.teardown_request
 # Auth "Blueprint" Routes #
 @app.route("/")
 def landing():
@@ -63,9 +64,9 @@ def login():
 
             if bcrypt.checkpw(password_bytes,hashed):
 
-                print("password accepted")
                 session["user_id"] = result[0]
                 session["logged_in"] = True
+                print(f"password accepted: {session["user_id"]}")
 
                 return redirect(url_for('home'))
             else:
