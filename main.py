@@ -1,13 +1,13 @@
-from flask import Flask,render_template,request,redirect,url_for,session,jsonify
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 import sqlite3
-import bcrypt 
+import bcrypt
 from dotenv import load_dotenv, dotenv_values
 
 config = dotenv_values(".env")
 app = Flask(__name__)
 
-app.secret_key = config['secret_key']
-database = 'cubeflow.db'
+app.secret_key = config["secret_key"]
+database = "cubeflow.db"
 
 createUsersTableQuery = """
 CREATE TABLE IF NOT EXISTS users
@@ -34,89 +34,87 @@ conn = sqlite3.connect(database)
 cur = conn.cursor()
 cur.execute(createUsersTableQuery)
 cur.execute(createSolvesTableQuery)
+conn.commit()
 conn.close()
 
-@app.teardown_request
+
 # Auth "Blueprint" Routes #
 @app.route("/")
 def landing():
     if session.get("logged_in") == True:
-        return redirect(url_for('home'))
-    return redirect(url_for('login'))
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        return render_template("index.html")
+    return redirect(url_for("login"))
 
-@app.route("/login",methods=["GET","POST"])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method=="POST":
-        username = request.form.get('un')
-        password = request.form.get('pw')
+    if request.method == "POST":
+        username = request.form.get("un")
+        password = request.form.get("pw")
 
         conn = sqlite3.connect(database)
         cur = conn.cursor()
 
         query = "SELECT user_id, username, password FROM users WHERE username = ?"
-        cur.execute(query,(username,))
+        cur.execute(query, (username,))
 
         result = cur.fetchone()
 
         if result:
-            password_bytes = password.encode('utf-8')
+            password_bytes = password.encode("utf-8")
             hashed = result[2]
 
-            if bcrypt.checkpw(password_bytes,hashed):
+            if bcrypt.checkpw(password_bytes, hashed):
 
                 session["user_id"] = result[0]
                 session["logged_in"] = True
-                print(f"password accepted: {session["user_id"]}")
-
-                return redirect(url_for('home'))
+                print(f"password accepted: User #{session["user_id"]}")
+                conn.close()
+                return redirect(url_for("landing"))
             else:
-                return render_template('login.html')
-
+                conn.close()
+                return redirect(url_for("login"))
         else:
-            return render_template('login.html')
+            return redirect(url_for("login"))
+    else:
+        return render_template("login.html")
 
 
-    return render_template('login.html')
-
-@app.route("/register",methods=["GET","POST"])
+@app.route("/register", methods=["GET", "POST"])
 def register():
 
-    if request.method=="POST":
-        username = request.form.get('un')
-        password = request.form.get('pw')
+    if request.method == "POST":
+        username = request.form.get("un")
+        password = request.form.get("pw")
 
-        #Check if account exists already
-        query = 'SELECT username FROM users WHERE username = ?'
-        conn=sqlite3.connect(database)
-        cur=conn.cursor()
-        cur.execute(query,(username,))
+        # Check if account exists already
+        query = "SELECT username FROM users WHERE username = ?"
+        conn = sqlite3.connect(database)
+        cur = conn.cursor()
+        cur.execute(query, (username,))
         result = cur.fetchone()
-        
-        #If an account with that username exists already, return the registration page again
+
+        # If an account with that username exists already, return the registration page again
         # If not, your account is added to the DB, and you get taken to the login page.
         if result:
             conn.close()
-            return render_template('register.html')
+            return render_template("register.html")
         else:
-            password_bytes = password.encode('utf-8')
-            hashed_password = bcrypt.hashpw(password_bytes,bcrypt.gensalt())
-            query = 'INSERT INTO users(username,password) VALUES (?,?)'
-            cur.execute(query,(username, hashed_password))
+            password_bytes = password.encode("utf-8")
+            hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+            query = "INSERT INTO users(username,password) VALUES (?,?)"
+            cur.execute(query, (username, hashed_password))
             conn.commit()
             conn.close()
             print("account made")
-            return redirect(url_for('login'))
+            return redirect(url_for("login"))
     else:
-        return render_template('register.html')
+        return render_template("register.html")
 
-@app.route("/home")
-def home():
-    if session.get("logged_in") == True:
-        return render_template('index.html')
-    else:
-        return redirect(url_for('login'))
-    
-@app.route("/solve",methods=["GET","POST"])
+
+@app.route("/solve", methods=["GET", "POST"])
 def solve():
     if request.method == "POST":
         # Upload solve into DB
@@ -126,15 +124,22 @@ def solve():
         solveData = request.get_json()
         conn = sqlite3.connect(database)
         cur = conn.cursor()
-        cur.execute(query,(solveData["time"],solveData["scramble"],session["user_id"],))
+        cur.execute(
+            query,
+            (
+                solveData["time"],
+                solveData["scramble"],
+                session["user_id"],
+            ),
+        )
         conn.commit()
         conn.close()
-        
-        return jsonify({"status":"success","message":"Solve recorded"}),200
+
+        return jsonify({"status": "success", "message": "Solve recorded"}), 200
     else:
         print("get from /solve")
         return "<h1>get from /solve</h1>"
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0")
