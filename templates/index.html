@@ -30,7 +30,8 @@
 
       <div id="stats">
         <script>
-          const solves = {{ solves | tojson | safe if solves else '[]'}};
+          var solves = "{{ data|tojson }}";
+          console.log(solves.length);
         </script>
       </div>
     </div>

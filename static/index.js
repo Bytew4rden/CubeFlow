@@ -2,7 +2,7 @@ function generateScramble() {
   let scramble = document.getElementById("scramble");
 
   const layers = ["U", "D", "L", "R", "F", "B"];
-  const moveTypes = ["", "'", "2"];
+  const moveTypes = ["", "i", "2"];
   const possibleNextLayers = {
     U: ["L", "R", "F", "B"],
     D: ["L", "R", "F", "B"],
@@ -50,6 +50,7 @@ function toggleTimer() {
       timer.textContent = (delta / 1000).toFixed(2);
     }, 10);
   } else {
+    //stop timer, clear timing interval
     clearInterval(timerInterval);
     timerInterval = null;
 
@@ -61,12 +62,14 @@ function toggleTimer() {
       time: String(timer.textContent),
     };
 
+    sendDataToBackend(data);
+
+    let statsDiv = document.getElementById("stats");
+
     //reset UI, generating a new scramble
     zero = 0;
     timer.textContent = zero.toFixed(2);
     generateScramble();
-
-    sendDataToBackend(data);
   }
 }
 

@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS solves
 solve_id INTEGER PRIMARY KEY,
 scramble TEXT,
 time_seconds REAL NOT NULL,
-penalty TEXT,
 user_id INTEGER NOT NULL,
 FOREIGN KEY (user_id) REFERENCES users(user_id) 
 );
@@ -47,10 +46,8 @@ def landing():
         query = " SELECT * FROM solves WHERE user_id = ? "
         cur.execute(query, (session["user_id"],))
         solves = cur.fetchall()
-        solves_list = [dict(solve) for solve in solves]
-
         conn.close()
-        return render_template("index.html", solves=solves_list)
+        return render_template("index.html", data=solves)
     else:
         return redirect(url_for("login"))
 
