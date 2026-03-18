@@ -44,8 +44,15 @@ def landing():
     if session.get("logged_in") == True:
         conn = sqlite3.connect(database)
         cur = conn.cursor()
-        return render_template("index.html")
-    return redirect(url_for("login"))
+        query = " SELECT * FROM solves WHERE user_id = ? "
+        cur.execute(query, (session["user_id"],))
+        solves = cur.fetchall()
+        solves_list = [dict(solve) for solve in solves]
+
+        conn.close()
+        return render_template("index.html", solves=solves_list)
+    else:
+        return redirect(url_for("login"))
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -79,7 +86,7 @@ def login():
         else:
             return redirect(url_for("login"))
     else:
-        if session["logged_in"] == True:
+        if session.get("logged_in") == True:
             return redirect(url_for("landing"))
         else:
             return render_template("login.html")

@@ -28,7 +28,11 @@
 
       <br />
 
-      <div id="stats"></div>
+      <div id="stats">
+        <script>
+          const solves = {{ solves | tojson | safe if solves else '[]'}};
+        </script>
+      </div>
     </div>
 
     <script src="../static/index.js"></script>
