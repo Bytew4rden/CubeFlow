@@ -79,7 +79,10 @@ def login():
         else:
             return redirect(url_for("login"))
     else:
-        return render_template("login.html")
+        if session["logged_in"] == True:
+            return redirect(url_for("landing"))
+        else:
+            return render_template("login.html")
 
 
 @app.route("/register", methods=["GET", "POST"])

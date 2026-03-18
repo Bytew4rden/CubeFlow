@@ -47,8 +47,8 @@ function toggleTimer() {
   if (started) {
     timerInterval = setInterval(() => {
       let delta = Date.now() - start;
-      timer.textContent = Math.floor(delta / 1000);
-    }, 1000);
+      timer.textContent = (delta / 1000).toFixed(2);
+    }, 10);
   } else {
     clearInterval(timerInterval);
     timerInterval = null;
@@ -62,7 +62,8 @@ function toggleTimer() {
     };
 
     //reset UI, generating a new scramble
-    timer.textContent = 0;
+    zero = 0;
+    timer.textContent = zero.toFixed(2);
     generateScramble();
 
     sendDataToBackend(data);
