@@ -1,8 +1,6 @@
 function generateScramble() {
-  let scramble = document.getElementById("scramble");
-
   const layers = ["U", "D", "L", "R", "F", "B"];
-  const moveTypes = ["", "i", "2"];
+  const moveTypes = ["", "'", "2"];
   const possibleNextLayers = {
     U: ["L", "R", "F", "B"],
     D: ["L", "R", "F", "B"],
@@ -28,7 +26,13 @@ function generateScramble() {
     newScramble.push(next + moveType);
   }
 
-  scramble.textContent = newScramble.join(" ");
+  // Build an alternate scramble string which is easier to read for display on the frontend.
+
+  displayedScramble = String(newScramble);
+  displayedScramble = displayedScramble.replace(/,/g, " ");
+
+  let scramble = document.getElementById("scramble");
+  scramble.textContent = displayedScramble;
 }
 generateScramble();
 
@@ -36,7 +40,6 @@ generateScramble();
 
 let started = false;
 let timerInterval = null;
-let solves = [];
 
 function toggleTimer() {
   let timer = document.getElementById("timer");
@@ -55,25 +58,41 @@ function toggleTimer() {
     timerInterval = null;
 
     let scramble = document.getElementById("scramble").textContent;
+    scramble = scramble.replace(/'/g, "i");
+    scramble = scramble.replace(/ /g, ",");
 
     //This 'data' variable is what's getting sent to the backend
     const data = {
-      scramble: String(scramble),
-      time: String(timer.textContent),
+      scramble: scramble,
+      time: timer.textContent,
     };
 
-    sendDataToBackend(data);
+    sendSolveToBackend(data);
 
-    let statsDiv = document.getElementById("stats");
-
-    //reset UI, generating a new scramble
-    zero = 0;
-    timer.textContent = zero.toFixed(2);
+    // zero = 0; // lol
+    // timer.textContent = zero.toFixed(2);
     generateScramble();
   }
 }
 
-async function sendDataToBackend(data) {
+var solves = [];
+async function getSolves(num) {
+  try {
+    const response = await fetch(`/get_solves/${num}`);
+    if (!response.ok) {
+      throw new Error(`Error! Status: ${response.status}`);
+    }
+    const data = await response.json();
+
+    solves = data;
+    console.log("solves: ", solves);
+    return solves;
+  } catch (error) {
+    console.error("Could not get solves: ", error);
+  }
+}
+
+async function sendSolveToBackend(data) {
   try {
     const response = await fetch("/solve", {
       method: "POST",

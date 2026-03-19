@@ -1,4 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify
+from flask import (
+    Flask,
+    render_template,
+    request,
+    Response,
+    redirect,
+    url_for,
+    session,
+    jsonify,
+)
 import sqlite3
 import bcrypt
 from dotenv import load_dotenv, dotenv_values
@@ -41,13 +50,8 @@ conn.close()
 @app.route("/")
 def landing():
     if session.get("logged_in") == True:
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        query = " SELECT * FROM solves WHERE user_id = ? "
-        cur.execute(query, (session["user_id"],))
-        solves = cur.fetchall()
-        conn.close()
-        return render_template("index.html", data=solves)
+
+        return render_template("index.html")
     else:
         return redirect(url_for("login"))
 
@@ -121,13 +125,11 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/solve", methods=["GET", "POST"])
+@app.route("/solve", methods=["POST"])
 def solve():
     if request.method == "POST":
         # Upload solve into DB
-        query = """
-        INSERT INTO solves(time_seconds,scramble,user_id) VALUES (?,?,?)
-        """
+        query = "INSERT INTO solves(time_seconds,scramble,user_id) VALUES (?,?,?)"
         solveData = request.get_json()
         conn = sqlite3.connect(database)
         cur = conn.cursor()
@@ -143,9 +145,38 @@ def solve():
         conn.close()
 
         return jsonify({"status": "success", "message": "Solve recorded"}), 200
-    else:
-        print("get from /solve")
-        return "<h1>get from /solve</h1>"
+
+
+@app.route("/get_solves/<int:num>")
+def get_solves(num):
+
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Login Required"}), 401
+
+    conn = sqlite3.connect(database)
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+
+    try:
+        query = (
+            " SELECT * FROM solves WHERE user_id = ? ORDER BY solve_id DESC LIMIT ? "
+        )
+        cur.execute(
+            query,
+            (
+                session["user_id"],
+                num,
+            ),
+        )
+        solves = [dict(solve) for solve in cur.fetchall()]
+        return jsonify(solves)
+
+    except Exception as e:
+        return jsonify({"error": str(e)})
+
+    finally:
+        conn.close()
 
 
 if __name__ == "__main__":
