@@ -147,8 +147,8 @@ def solve():
         return jsonify({"status": "success", "message": "Solve recorded"}), 200
 
 
-@app.route("/get_solves/<int:num>")
-def get_solves(num):
+@app.route("/get_solves/")
+def get_solves():
 
     user_id = session.get("user_id")
     if not user_id:
@@ -159,16 +159,8 @@ def get_solves(num):
     cur = conn.cursor()
 
     try:
-        query = (
-            " SELECT * FROM solves WHERE user_id = ? ORDER BY solve_id DESC LIMIT ? "
-        )
-        cur.execute(
-            query,
-            (
-                session["user_id"],
-                num,
-            ),
-        )
+        query = " SELECT * FROM solves WHERE user_id = ? ORDER BY solve_id DESC "
+        cur.execute(query, (session["user_id"],))
         solves = [dict(solve) for solve in cur.fetchall()]
         return jsonify(solves)
 

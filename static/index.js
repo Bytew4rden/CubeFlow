@@ -1,5 +1,3 @@
-var solves = [];
-
 function generateScramble() {
   const layers = ["U", "D", "L", "R", "F", "B"];
   const moveTypes = ["", "'", "2"];
@@ -36,7 +34,6 @@ function generateScramble() {
   let scramble = document.getElementById("scramble");
   scramble.textContent = displayedScramble;
 }
-generateScramble();
 
 //Timer Script
 
@@ -77,11 +74,10 @@ function toggleTimer() {
   }
 }
 
-function updateUI() {}
-
-async function getSolves(num) {
+var solves = [];
+async function getSolves() {
   try {
-    const response = await fetch(`/get_solves/${num}`);
+    const response = await fetch(`/get_solves/`);
     if (!response.ok) {
       throw new Error(`Error! Status: ${response.status}`);
     }
@@ -110,3 +106,21 @@ async function sendSolveToBackend(data) {
     console.error("POST to /solve failure");
   }
 }
+
+function updateUI() {
+  var length = solves.length;
+  console.log(length);
+
+  var best = document.getElementById("best");
+  var avg3 = document.getElementById("avg3");
+  var avg5 = document.getElementById("avg5");
+  var avg12 = document.getElementById("avg12");
+  var avgAll = document.getElementById("avgAll");
+
+  console.log(solves);
+}
+
+getSolves();
+generateScramble();
+
+updateUI();
