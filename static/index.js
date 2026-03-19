@@ -1,3 +1,5 @@
+var solves = [];
+
 function generateScramble() {
   const layers = ["U", "D", "L", "R", "F", "B"];
   const moveTypes = ["", "'", "2"];
@@ -75,7 +77,8 @@ function toggleTimer() {
   }
 }
 
-var solves = [];
+function updateUI() {}
+
 async function getSolves(num) {
   try {
     const response = await fetch(`/get_solves/${num}`);
@@ -84,8 +87,10 @@ async function getSolves(num) {
     }
     const data = await response.json();
 
+    //'solves' variable is at the top of this .js file.
+    //   We populate that array with this line
     solves = data;
-    console.log("solves: ", solves);
+
     return solves;
   } catch (error) {
     console.error("Could not get solves: ", error);
