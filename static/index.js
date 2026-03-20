@@ -40,7 +40,7 @@ function generateScramble() {
 let started = false;
 let timerInterval = null;
 
-function toggleTimer() {
+async function toggleTimer() {
   let timer = document.getElementById("timer");
   let start = Date.now();
 
@@ -66,8 +66,8 @@ function toggleTimer() {
       time: timer.textContent,
     };
 
-    sendSolveToBackend(data);
-
+    await sendSolveToBackend(data);
+    await getSolves();
     // zero = 0; // lol
     // timer.textContent = zero.toFixed(2);
     generateScramble();
@@ -86,6 +86,7 @@ async function getSolves() {
     //'solves' variable is at the top of this .js file.
     //   We populate that array with this line
     solves = data;
+    updateUI();
 
     return solves;
   } catch (error) {
@@ -108,19 +109,49 @@ async function sendSolveToBackend(data) {
 }
 
 function updateUI() {
-  var length = solves.length;
-  console.log(length);
-
+  var last = document.getElementById("last");
   var best = document.getElementById("best");
   var avg3 = document.getElementById("avg3");
   var avg5 = document.getElementById("avg5");
   var avg12 = document.getElementById("avg12");
   var avgAll = document.getElementById("avgAll");
 
-  console.log(solves);
+  var lengthSolves = solves.length;
+
+  //Find last and best solve
+  if (lengthSolves > 0) {
+    last.textContent = solves[0].time_seconds;
+    var bestTime = Infinity;
+    for (const solve of solves) {
+      var solveTime = parseFloat(solve.time_seconds);
+      if (solveTime < bestTime) {
+        bestTime = solveTime;
+      }
+    }
+    best.textContent = bestTime;
+  } else {
+    last.textContent = "--";
+    best.textContent = "--";
+  }
+
+  avg3.textContent = calculateSolveAvg(solves, 3);
+  avg5.textContent = calculateSolveAvg(solves, 5);
+  avg12.textContent = calculateSolveAvg(solves, 12);
+  avgAll.textContent = calculateSolveAvg(solves, solves.length);
+}
+
+function calculateSolveAvg(arr, num) {
+  if (arr.length >= num) {
+    var sum = 0;
+    for (let i = 0; i < num; i++) {
+      sum += parseFloat(arr[i].time_seconds);
+    }
+    sum /= num;
+    return sum.toFixed(2);
+  } else {
+    return "--";
+  }
 }
 
 getSolves();
 generateScramble();
-
-updateUI();
