@@ -7,6 +7,7 @@ from flask import (
     url_for,
     session,
     jsonify,
+    flash,
 )
 import sqlite3
 import bcrypt
@@ -111,6 +112,7 @@ def register():
         # If not, your account is added to the DB, and you get taken to the login page.
         if result:
             conn.close()
+            flash("Username taken", "un_error")
             return render_template("register.html")
         else:
             password_bytes = password.encode("utf-8")

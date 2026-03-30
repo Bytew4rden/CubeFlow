@@ -8,9 +8,7 @@
   </head>
   <body>
     <div id="app">
-      <div>
-        <h1>CubeFlow</h1>
-      </div>
+      <h1>CubeFlow</h1>
 
       <br />
 
@@ -23,31 +21,34 @@
 
       <div>
         <h2 id="timer">0.00</h2>
-        <button onclick="toggleTimer()">Start Timer</button>
+        <button id="timer_btn" onclick="toggleTimer()">Start Timer</button>
       </div>
 
       <br />
 
-      <h2>Stats</h2>
+      <h1>Stats</h1>
 
       <div id="stats">
-        <h5>Last Solve:</h5>
+        <h4>Last Solve:</h4>
         <p id="last"></p>
 
-        <h5>Best Solve:</h5>
+        <h4>Best Solve:</h4>
         <p id="best"></p>
 
-        <h5>Avg 3:</h5>
+        <h4>Avg 3:</h4>
         <p id="avg3"></p>
 
-        <h5>Avg 5:</h5>
+        <h4>Avg 5:</h4>
         <p id="avg5"></p>
 
-        <h5>Avg 12:</h5>
+        <h4>Avg 12:</h4>
         <p id="avg12"></p>
 
-        <h5>Lifetime Avg:</h5>
+        <h4>Lifetime Avg:</h4>
         <p id="avgAll"></p>
+
+        <h4>Solves</h4>
+        <ul id="solves_tbl"></ul>
       </div>
     </div>
 

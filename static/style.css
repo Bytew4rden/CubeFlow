@@ -16,3 +16,7 @@ body {
   max-width: 300px; /* Keeps it from stretching across the whole screen */
   align-items: center;
 }
+#stats > :last-child {
+  display: inline;
+  overflow: hidden;
+}

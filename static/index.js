@@ -42,16 +42,19 @@ let timerInterval = null;
 
 async function toggleTimer() {
   let timer = document.getElementById("timer");
+  let timer_btn = document.getElementById("timer_btn");
   let start = Date.now();
 
   started = !started;
 
   if (started) {
+    timer_btn.textContent = "Stop Timer";
     timerInterval = setInterval(() => {
       let delta = Date.now() - start;
       timer.textContent = (delta / 1000).toFixed(2);
     }, 10);
   } else {
+    timer_btn.textContent = "Start Timer";
     //stop timer, clear timing interval
     clearInterval(timerInterval);
     timerInterval = null;
@@ -115,6 +118,7 @@ function updateUI() {
   var avg5 = document.getElementById("avg5");
   var avg12 = document.getElementById("avg12");
   var avgAll = document.getElementById("avgAll");
+  var solvesTable = document.getElementById("solves_tbl");
 
   var lengthSolves = solves.length;
 
@@ -138,6 +142,24 @@ function updateUI() {
   avg5.textContent = calculateSolveAvg(solves, 5);
   avg12.textContent = calculateSolveAvg(solves, 12);
   avgAll.textContent = calculateSolveAvg(solves, solves.length);
+
+  for (let i = 0; i < solves.length; i++) {
+    const li = document.createElement("li");
+
+    const solveNum = document.createElement("span");
+    solveNum.textContent = solves.length - i;
+    li.appendChild(solveNum);
+
+    const scrambleSpan = document.createElement("span");
+    scrambleSpan.textContent = solves[i].scramble;
+    li.appendChild(scrambleSpan);
+
+    const timeSpan = document.createElement("span");
+    timeSpan.textContent = solves[i].time_seconds;
+    li.appendChild(timeSpan);
+
+    solvesTable.appendChild(li);
+  }
 }
 
 function calculateSolveAvg(arr, num) {

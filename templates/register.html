@@ -1,8 +1,12 @@
 <a href="/login">Back</a>
 <form action="/register" method="post">
-  <p>Pick a Username</p>
+  {% with messages = get_flashed_messages(category_filter=["un_error"]) %} {% if
+  messages %}
+  <p>{{ messages[0] }}</p>
+  {% endif %} {% endwith %}
+  <h3>Pick a Username</h3>
   <input type="text" name="un" placeholder="Username" />
-  <p>Pick a Password</p>
+  <h3>Pick a Password</h3>
   <input type="text" name="pw" placeholder="Password" />
   <input type="submit" value="Submit" />
 </form>
