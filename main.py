@@ -11,7 +11,7 @@ from flask import (
 )
 import sqlite3
 import bcrypt
-from dotenv import load_dotenv, dotenv_values
+from dotenv import dotenv_values
 
 
 config = dotenv_values(".env")
