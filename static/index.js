@@ -143,7 +143,7 @@ function updateUI() {
 
   //Find last and best solve
   if (lengthSolves > 0) {
-    last.textContent = solves[0].time_seconds;
+    last.textContent = solves[solves.length - 1].time_seconds;
     var bestTime = Infinity;
     for (const solve of solves) {
       var solveTime = parseFloat(solve.time_seconds);
