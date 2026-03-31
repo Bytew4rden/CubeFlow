@@ -60,8 +60,8 @@ async function toggleTimer() {
     timerInterval = null;
 
     let scramble = document.getElementById("scramble").textContent;
-    scramble = scramble.replace(/'/g, "i");
-    scramble = scramble.replace(/ /g, ",");
+    // scramble = scramble.replace(/'/g, "i");
+    // scramble = scramble.replace(/ /g, ",");
 
     //This 'data' variable is what's getting sent to the backend
     const data = {
@@ -107,10 +107,21 @@ async function sendSolveToBackend(data) {
       body: JSON.stringify(data),
     });
   } catch (error) {
-    console.error("POST to /solve failure");
+    console.error("POST to /solve failed");
   }
 }
 
+async function deleteSolve(solveID) {
+  try {
+    const response = await fetch(`/delete_solve/${solveID}`, {
+      method: "DELETE",
+    });
+    getSolves();
+    updateUI();
+  } catch (error) {
+    console.error("DELETE to /delete_solve/$solveID$ failed");
+  }
+}
 function updateUI() {
   var last = document.getElementById("last");
   var best = document.getElementById("best");
@@ -118,7 +129,7 @@ function updateUI() {
   var avg5 = document.getElementById("avg5");
   var avg12 = document.getElementById("avg12");
   var avgAll = document.getElementById("avgAll");
-  var solvesTable = document.getElementById("solves_tbl");
+  var solvesTableBody = document.getElementById("solves_tbl_body");
 
   var lengthSolves = solves.length;
 
@@ -143,22 +154,19 @@ function updateUI() {
   avg12.textContent = calculateSolveAvg(solves, 12);
   avgAll.textContent = calculateSolveAvg(solves, solves.length);
 
+  // create solves table
+  solvesTableBody.innerHTML = "";
   for (let i = 0; i < solves.length; i++) {
-    const li = document.createElement("li");
+    const tr = document.createElement("tr");
 
-    const solveNum = document.createElement("span");
-    solveNum.textContent = solves.length - i;
-    li.appendChild(solveNum);
+    tr.innerHTML = `
+    <td>${solves.length - i}</td>
+    <td>${solves[i].scramble}</td>
+    <td>${solves[i].time_seconds}</td>
+    <td><button onclick="deleteSolve(${solves.length - i})" > X </button></td>
+    `;
 
-    const scrambleSpan = document.createElement("span");
-    scrambleSpan.textContent = solves[i].scramble;
-    li.appendChild(scrambleSpan);
-
-    const timeSpan = document.createElement("span");
-    timeSpan.textContent = solves[i].time_seconds;
-    li.appendChild(timeSpan);
-
-    solvesTable.appendChild(li);
+    solvesTableBody.appendChild(tr);
   }
 }
 

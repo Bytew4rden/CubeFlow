@@ -1,22 +1,10 @@
-body {
-  background-color: rgb(22, 103, 184);
+* {
+  padding: 1px;
 }
-#app {
-  width: 50%;
-  margin-left: auto;
-  margin-right: auto;
-  color: rgb(255, 255, 255);
+body {
+  background-color: rgb(65, 112, 242);
 }
 
-#stats {
-  display: grid;
-  /* This creates two columns: one for labels, one for values */
-  grid-template-columns: 1fr 1fr;
-  gap: 1px; /* Space between the items */
-  max-width: 300px; /* Keeps it from stretching across the whole screen */
-  align-items: center;
-}
-#stats > :last-child {
-  display: inline;
-  overflow: hidden;
+#app {
+  color: aliceblue;
 }

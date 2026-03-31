@@ -13,6 +13,7 @@ import sqlite3
 import bcrypt
 from dotenv import load_dotenv, dotenv_values
 
+
 config = dotenv_values(".env")
 app = Flask(__name__)
 
@@ -79,6 +80,7 @@ def login():
 
                 session["user_id"] = result[0]
                 session["logged_in"] = True
+                session.permanent = False
                 print(f"password accepted: User #{session["user_id"]}")
                 conn.close()
                 return redirect(url_for("landing"))
@@ -169,6 +171,34 @@ def get_solves():
     except Exception as e:
         return jsonify({"error": str(e)})
 
+    finally:
+        conn.close()
+
+
+@app.route("/delete_solve/<solveID>", methods=["DELETE"])
+def delete_solve(solveID):
+    user_id = session.get("user_id")
+    if not user_id:
+        return jsonify({"error": "Login Required"}), 401
+
+    conn = sqlite3.connect(database)
+    cur = conn.cursor()
+
+    try:
+        query = """
+        DELETE FROM solves WHERE user_id = ? AND solve_id = ?
+        """
+        cur.execute(
+            query,
+            (
+                session["user_id"],
+                solveID,
+            ),
+        )
+        conn.commit()
+        return jsonify({"message": "Solve Deleted"}, 200)
+    except Exception as e:
+        return jsonify({"error": str(e)})
     finally:
         conn.close()
 

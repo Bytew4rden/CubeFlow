@@ -10,8 +10,6 @@
     <div id="app">
       <h1>CubeFlow</h1>
 
-      <br />
-
       <div>
         <h2 id="scramble"></h2>
         <button onclick="generateScramble()">New Scramble</button>
@@ -26,29 +24,49 @@
 
       <br />
 
-      <h1>Stats</h1>
-
       <div id="stats">
-        <h4>Last Solve:</h4>
-        <p id="last"></p>
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Last Solve</th>
+              <td id="last"></td>
+            </tr>
+            <tr>
+              <th scope="row">Best Solve</th>
+              <td id="best"></td>
+            </tr>
+            <tr>
+              <th scope="row">Avg 3</th>
+              <td id="avg3"></td>
+            </tr>
+            <tr>
+              <th scope="row">Avg 5</th>
+              <td id="avg5"></td>
+            </tr>
+            <tr>
+              <th scope="row">Avg 12</th>
+              <td id="avg12"></td>
+            </tr>
+            <tr>
+              <th scope="row">Lifetime Avg</th>
+              <td id="avgAll"></td>
+            </tr>
+          </tbody>
+        </table>
 
-        <h4>Best Solve:</h4>
-        <p id="best"></p>
-
-        <h4>Avg 3:</h4>
-        <p id="avg3"></p>
-
-        <h4>Avg 5:</h4>
-        <p id="avg5"></p>
-
-        <h4>Avg 12:</h4>
-        <p id="avg12"></p>
-
-        <h4>Lifetime Avg:</h4>
-        <p id="avgAll"></p>
-
-        <h4>Solves</h4>
-        <ul id="solves_tbl"></ul>
+        <table id="solves_tbl">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Scramble</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="solves_tbl_body">
+            <!-- This section is auto-filled in the 
+             index.js - UpdateUI() function. -->
+          </tbody>
+        </table>
       </div>
     </div>
 
