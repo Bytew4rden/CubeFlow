@@ -116,7 +116,15 @@ async function deleteSolve(solveID) {
     const response = await fetch(`/delete_solve/${solveID}`, {
       method: "DELETE",
     });
-    getSolves();
+
+    let index;
+
+    for (let i = 0; i < solves.length; i++) {
+      if (solves[i].solve_id === solveID) {
+        index = i;
+      }
+    }
+    solves.splice(index, 1);
     updateUI();
   } catch (error) {
     console.error("DELETE to /delete_solve/$solveID$ failed");
@@ -156,16 +164,15 @@ function updateUI() {
 
   // create solves table
   solvesTableBody.innerHTML = "";
-  for (let i = 0; i < solves.length; i++) {
+  for (let i = solves.length - 1; i >= 0; i--) {
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
-    <td>${solves.length - i}</td>
+    <td>${i + 1}</td>
     <td>${solves[i].scramble}</td>
     <td>${solves[i].time_seconds}</td>
-    <td><button onclick="deleteSolve(${solves.length - i})" > X </button></td>
+    <td><button onclick="deleteSolve(${solves[i].solve_id})" > X </button></td>
     `;
-
     solvesTableBody.appendChild(tr);
   }
 }

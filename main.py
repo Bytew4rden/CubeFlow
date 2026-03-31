@@ -88,6 +88,7 @@ def login():
                 conn.close()
                 return redirect(url_for("login"))
         else:
+            conn.close()
             return redirect(url_for("login"))
     else:
         if session.get("logged_in") == True:
@@ -148,7 +149,7 @@ def solve():
         conn.commit()
         conn.close()
 
-        return jsonify({"status": "success", "message": "Solve recorded"}), 200
+        return jsonify({"message": "Solve recorded"}), 200
 
 
 @app.route("/get_solves/")
@@ -163,13 +164,13 @@ def get_solves():
     cur = conn.cursor()
 
     try:
-        query = " SELECT * FROM solves WHERE user_id = ? ORDER BY solve_id DESC "
-        cur.execute(query, (session["user_id"],))
+        query = " SELECT * FROM solves WHERE user_id = ? ORDER BY solve_id"
+        cur.execute(query, (user_id,))
         solves = [dict(solve) for solve in cur.fetchall()]
         return jsonify(solves)
 
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}, 500)
 
     finally:
         conn.close()
@@ -191,14 +192,14 @@ def delete_solve(solveID):
         cur.execute(
             query,
             (
-                session["user_id"],
+                user_id,
                 solveID,
             ),
         )
         conn.commit()
         return jsonify({"message": "Solve Deleted"}, 200)
     except Exception as e:
-        return jsonify({"error": str(e)})
+        return jsonify({"error": str(e)}, 500)
     finally:
         conn.close()
 
