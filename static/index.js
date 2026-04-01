@@ -71,8 +71,7 @@ async function toggleTimer() {
 
     await sendSolveToBackend(data);
     await getSolves();
-    // zero = 0; // lol
-    // timer.textContent = zero.toFixed(2);
+
     generateScramble();
   }
 }
@@ -80,7 +79,7 @@ async function toggleTimer() {
 var solves = [];
 async function getSolves() {
   try {
-    const response = await fetch(`/get_solves/`);
+    const response = await fetch(`/get_solves`);
     if (!response.ok) {
       throw new Error(`Error! Status: ${response.status}`);
     }

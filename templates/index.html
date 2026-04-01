@@ -9,19 +9,18 @@
   <body>
     <div id="app">
       <h1>CubeFlow</h1>
-
-      <div>
+      <div id="scramble_div">
         <h2 id="scramble"></h2>
         <button onclick="generateScramble()">New Scramble</button>
       </div>
 
-      <div>
+      <div id="timer_div">
         <h2 id="timer">0.00</h2>
         <button id="timer_btn" onclick="toggleTimer()">Start Timer</button>
       </div>
 
       <div id="stats">
-        <table>
+        <table id="aggr_tbl">
           <tbody>
             <tr>
               <th scope="row">Last Solve</th>

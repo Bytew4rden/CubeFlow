@@ -81,7 +81,6 @@ def login():
                 session["user_id"] = result[0]
                 session["logged_in"] = True
                 session.permanent = False
-                print(f"password accepted: User #{session["user_id"]}")
                 conn.close()
                 return redirect(url_for("landing"))
             else:
@@ -136,28 +135,27 @@ def solve():
         # Upload solve into DB
         query = "INSERT INTO solves(time_seconds,scramble,user_id) VALUES (?,?,?)"
         solveData = request.get_json()
+
+        time = solveData["time"]
+        scramble = solveData["scramble"]
+        user_id = session.get("user_id")
+
         conn = sqlite3.connect(database)
         cur = conn.cursor()
-        cur.execute(
-            query,
-            (
-                solveData["time"],
-                solveData["scramble"],
-                session["user_id"],
-            ),
-        )
+
+        cur.execute(query, (time, scramble, user_id))
         conn.commit()
         conn.close()
 
-        return jsonify({"message": "Solve recorded"}), 200
+        return jsonify({"message": "Solve recorded"})
 
 
-@app.route("/get_solves/")
+@app.route("/get_solves")
 def get_solves():
 
     user_id = session.get("user_id")
     if not user_id:
-        return jsonify({"error": "Login Required"}), 401
+        return jsonify({"error": "Login Required"})
 
     conn = sqlite3.connect(database)
     conn.row_factory = sqlite3.Row
@@ -170,7 +168,7 @@ def get_solves():
         return jsonify(solves)
 
     except Exception as e:
-        return jsonify({"error": str(e)}, 500)
+        return jsonify({"error": str(e)})
 
     finally:
         conn.close()
@@ -180,26 +178,18 @@ def get_solves():
 def delete_solve(solveID):
     user_id = session.get("user_id")
     if not user_id:
-        return jsonify({"error": "Login Required"}), 401
+        return jsonify({"error": "Login Required"})
 
     conn = sqlite3.connect(database)
     cur = conn.cursor()
 
     try:
-        query = """
-        DELETE FROM solves WHERE user_id = ? AND solve_id = ?
-        """
-        cur.execute(
-            query,
-            (
-                user_id,
-                solveID,
-            ),
-        )
+        query = " DELETE FROM solves WHERE user_id = ? AND solve_id = ?"
+        cur.execute(query, (user_id, solveID))
         conn.commit()
-        return jsonify({"message": "Solve Deleted"}, 200)
+        return jsonify({"message": "Solve Deleted"})
     except Exception as e:
-        return jsonify({"error": str(e)}, 500)
+        return jsonify({"error": str(e)})
     finally:
         conn.close()
 

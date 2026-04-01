@@ -1,10 +1,46 @@
-* {
-  padding: 1px;
-}
 body {
-  background-color: rgb(65, 112, 242);
+  background-color: rgb(44, 94, 233);
 }
 
 #app {
-  color: aliceblue;
+  color: rgb(255, 255, 255);
+  max-width: 50%;
+  margin-left: 25%;
+}
+
+/* #stats {
+  display: flex;
+} */
+#scramble_div {
+  margin: 20px;
+}
+
+#timer_div {
+  margin: 20px;
+}
+
+#aggr_tbl {
+  margin: 20px;
+}
+
+#solves_tbl {
+  margin: 20px;
+}
+#solves_tbl th {
+  margin: 20px;
+  border-bottom: 1px solid;
+}
+#solves_tbl td {
+  padding: 3px;
+  border-right: 1px solid;
+  border-bottom: 1px solid;
+  margin: 20px;
+}
+#solves_tbl td:first-child {
+  border-left: 1px solid;
+}
+#solves_tbl td:last-child {
+  border-top: 0px;
+  border-right: 0px;
+  border-bottom: 0px;
 }
