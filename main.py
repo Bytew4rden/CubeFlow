@@ -181,7 +181,7 @@ def get_solves():
         return jsonify(solves)
 
     except Exception:
-        return jsonify(error="Internal Server Error,")
+        return jsonify(error="Internal Server Error, could not get Solves")
 
     finally:
         conn.close()
