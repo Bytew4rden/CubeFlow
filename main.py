@@ -154,13 +154,12 @@ def solve():
 
         try:
             cur.execute(query, (time, scramble, user_id))
+            conn.commit()
+            return jsonify(message="Success: Solve Recorded")
         except Exception:
             return jsonify(error="Error uploading solve to DB")
         finally:
-            conn.commit()
             conn.close()
-
-        return jsonify(message="Success: Solve Recorded")
 
 
 @app.route("/get_solves")
