@@ -76,6 +76,12 @@ async function toggleTimer() {
   }
 }
 
+window.addEventListener("keydown", (e) => {
+  if (e.key == " ") {
+    toggleTimer();
+  }
+});
+
 var solves = [];
 async function getSolves() {
   try {
