@@ -21,4 +21,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: pfrehner98/cubeflow:latest
+          tags: pfrehner98/cubeflow:${{ github.sha }}
