@@ -43,7 +43,7 @@ form input[type="text"] {
 }
 
 form input[type="submit"] {
-  background-color: rgb(44, 94, 233);
+  background-color: rgb(44, 94, 234);
   color: rgb(255, 255, 255);
   cursor: pointer;
   font-weight: bold;
