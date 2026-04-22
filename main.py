@@ -11,13 +11,13 @@ from flask import (
 )
 import sqlite3
 import bcrypt
-from dotenv import dotenv_values
+from dotenv import load_dotenv
+import os
 
-
-config = dotenv_values(".env")
+load_dotenv()
 app = Flask(__name__)
 
-app.secret_key = config["secret_key"]
+app.secret_key = os.getenv("SECRET_KEY")
 database = "cubeflow.db"
 
 createUsersTableQuery = """

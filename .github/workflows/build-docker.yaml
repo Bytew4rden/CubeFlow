@@ -8,8 +8,7 @@ jobs:
     steps:
       - name: Create .env file
         run: |
-          touch .env
-          echo "secret_key=${{ secrets.SECRET_KEY }}" >> .env
+          echo "secret_key = ${{ secrets.SECRET_KEY }}" >> .env
       - name: Check out the repository
         uses: actions/checkout@v4
       - name: Log in to Docker Hub
