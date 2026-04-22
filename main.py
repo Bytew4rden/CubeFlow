@@ -52,7 +52,6 @@ conn.close()
 @app.route("/")
 def landing():
     if session.get("logged_in") == True:
-
         return render_template("index.html")
     else:
         return redirect(url_for("login"))
@@ -61,34 +60,37 @@ def landing():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("un")
-        password = request.form.get("pw")
+        try:
+            username = request.form.get("un")
+            password = request.form.get("pw")
 
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
+            conn = sqlite3.connect(database)
+            cur = conn.cursor()
 
-        query = "SELECT user_id, username, password FROM users WHERE username = ?"
-        cur.execute(query, (username,))
+            query = "SELECT user_id, username, password FROM users WHERE username = ?"
+            cur.execute(query, (username,))
 
-        result = cur.fetchone()
+            result = cur.fetchone()
 
-        if result:
-            password_bytes = password.encode("utf-8")
-            hashed = result[2]
+            if result:
+                password_bytes = password.encode("utf-8")
+                hashed = result[2]
 
-            if bcrypt.checkpw(password_bytes, hashed):
+                if bcrypt.checkpw(password_bytes, hashed):
 
-                session["user_id"] = result[0]
-                session["logged_in"] = True
-                session.permanent = False
-                conn.close()
-                return redirect(url_for("landing"))
+                    session["user_id"] = result[0]
+                    session["logged_in"] = True
+                    session.permanent = False
+                    conn.close()
+                    return redirect(url_for("landing"))
+                else:
+                    conn.close()
+                    return redirect(url_for("login"))
             else:
                 conn.close()
                 return redirect(url_for("login"))
-        else:
-            conn.close()
-            return redirect(url_for("login"))
+        except Exception:
+            return jsonify(error="Internal Server Error")
     else:
         if session.get("logged_in") == True:
             return redirect(url_for("landing"))
@@ -100,31 +102,35 @@ def login():
 def register():
 
     if request.method == "POST":
-        username = request.form.get("un")
-        password = request.form.get("pw")
 
-        # Check if account exists already
-        query = "SELECT username FROM users WHERE username = ?"
-        conn = sqlite3.connect(database)
-        cur = conn.cursor()
-        cur.execute(query, (username,))
-        result = cur.fetchone()
+        try:
+            username = request.form.get("un")
+            password = request.form.get("pw")
 
-        # If an account with that username exists already, return the registration page again
-        # If not, your account is added to the DB, and you get taken to the login page.
-        if result:
-            conn.close()
-            flash("Username taken", "un_error")
-            return render_template("register.html")
-        else:
-            password_bytes = password.encode("utf-8")
-            hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
-            query = "INSERT INTO users(username,password) VALUES (?,?)"
-            cur.execute(query, (username, hashed_password))
-            conn.commit()
-            conn.close()
-            print("account made")
-            return redirect(url_for("login"))
+            # Check if account exists already
+            query = "SELECT username FROM users WHERE username = ?"
+            conn = sqlite3.connect(database)
+            cur = conn.cursor()
+            cur.execute(query, (username,))
+            result = cur.fetchone()
+
+            # If an account with that username exists already, return the registration page again
+            # If not, your account is added to the DB, and you get taken to the login page.
+            if result:
+                conn.close()
+                flash("Username taken", "un_error")
+                return render_template("register.html")
+            else:
+                password_bytes = password.encode("utf-8")
+                hashed_password = bcrypt.hashpw(password_bytes, bcrypt.gensalt())
+                query = "INSERT INTO users(username,password) VALUES (?,?)"
+                cur.execute(query, (username, hashed_password))
+                conn.commit()
+                conn.close()
+                print("account made")
+                return redirect(url_for("login"))
+        except Exception:
+            return jsonify(error="Internal Server Error")
     else:
         return render_template("register.html")
 
@@ -140,14 +146,20 @@ def solve():
         scramble = solveData["scramble"]
         user_id = session.get("user_id")
 
+        if not user_id:
+            return jsonify({"error": "Login Required"})
+
         conn = sqlite3.connect(database)
         cur = conn.cursor()
 
-        cur.execute(query, (time, scramble, user_id))
-        conn.commit()
-        conn.close()
-
-        return jsonify({"message": "Solve recorded"})
+        try:
+            cur.execute(query, (time, scramble, user_id))
+            conn.commit()
+            return jsonify(message="Success: Solve Recorded")
+        except Exception:
+            return jsonify(error="Error uploading solve to DB")
+        finally:
+            conn.close()
 
 
 @app.route("/get_solves")
@@ -167,14 +179,14 @@ def get_solves():
         solves = [dict(solve) for solve in cur.fetchall()]
         return jsonify(solves)
 
-    except Exception as e:
-        return jsonify({"error": str(e)})
+    except Exception:
+        return jsonify(error="Internal Server Error, could not get Solves")
 
     finally:
         conn.close()
 
 
-@app.route("/delete_solve/<solveID>", methods=["DELETE"])
+@app.route("/delete_solve/<int:solveID>", methods=["DELETE"])
 def delete_solve(solveID):
     user_id = session.get("user_id")
     if not user_id:
@@ -188,8 +200,8 @@ def delete_solve(solveID):
         cur.execute(query, (user_id, solveID))
         conn.commit()
         return jsonify({"message": "Solve Deleted"})
-    except Exception as e:
-        return jsonify({"error": str(e)})
+    except Exception:
+        return jsonify(error="Internal Server Error, Could not delete Solve")
     finally:
         conn.close()
 
