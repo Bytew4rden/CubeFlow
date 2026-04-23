@@ -18,7 +18,14 @@ load_dotenv()
 app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
-database = "cubeflow.db"
+
+baseDir = os.path.abspath(os.path.dirname(__file__))
+db_dir = os.path.join(baseDir, "data")
+db_path = os.path.join(db_dir, "cubeflow.db")
+
+if not os.path.exists(db_dir):
+    os.makedirs(db_dir)
+
 
 createUsersTableQuery = """
 CREATE TABLE IF NOT EXISTS users
@@ -40,7 +47,7 @@ FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 """
 
-conn = sqlite3.connect(database)
+conn = sqlite3.connect(db_path)
 cur = conn.cursor()
 cur.execute(createUsersTableQuery)
 cur.execute(createSolvesTableQuery)
@@ -64,7 +71,7 @@ def login():
             username = request.form.get("un")
             password = request.form.get("pw")
 
-            conn = sqlite3.connect(database)
+            conn = sqlite3.connect(db_path)
             cur = conn.cursor()
 
             query = "SELECT user_id, username, password FROM users WHERE username = ?"
@@ -90,7 +97,7 @@ def login():
                 conn.close()
                 return redirect(url_for("login"))
         except Exception:
-            return jsonify(error="Internal Server Error")
+            return jsonify(error="Failed to talk to user db")
     else:
         if session.get("logged_in") == True:
             return redirect(url_for("landing"))
@@ -109,7 +116,7 @@ def register():
 
             # Check if account exists already
             query = "SELECT username FROM users WHERE username = ?"
-            conn = sqlite3.connect(database)
+            conn = sqlite3.connect(db_path)
             cur = conn.cursor()
             cur.execute(query, (username,))
             result = cur.fetchone()
@@ -149,7 +156,7 @@ def solve():
         if not user_id:
             return jsonify({"error": "Login Required"})
 
-        conn = sqlite3.connect(database)
+        conn = sqlite3.connect(db_path)
         cur = conn.cursor()
 
         try:
@@ -169,7 +176,7 @@ def get_solves():
     if not user_id:
         return jsonify({"error": "Login Required"})
 
-    conn = sqlite3.connect(database)
+    conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -192,7 +199,7 @@ def delete_solve(solveID):
     if not user_id:
         return jsonify({"error": "Login Required"})
 
-    conn = sqlite3.connect(database)
+    conn = sqlite3.connect(db_path)
     cur = conn.cursor()
 
     try:
