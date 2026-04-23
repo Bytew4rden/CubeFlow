@@ -19,12 +19,9 @@ app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
 
-baseDir = os.path.abspath(os.path.dirname(__file__))
-db_dir = os.path.join(baseDir, "data")
-db_path = os.path.join(db_dir, "cubeflow.db")
+db_path = "/app/data/cubeflow.db"
 
-if not os.path.exists(db_dir):
-    os.makedirs(db_dir)
+os.makedirs("/app/data", exist_ok=True)
 
 
 createUsersTableQuery = """
@@ -97,7 +94,7 @@ def login():
                 conn.close()
                 return redirect(url_for("login"))
         except Exception:
-            return jsonify(error="Failed to talk to user db")
+            return jsonify(error="Failed to grab data from user db")
     else:
         if session.get("logged_in") == True:
             return redirect(url_for("landing"))
