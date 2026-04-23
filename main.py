@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS users
 (
 user_id INTEGER PRIMARY KEY,
 username TEXT UNIQUE NOT NULL,
-password TEXT NOT NULL
+password BLOB NOT NULL
 );
 """
 
