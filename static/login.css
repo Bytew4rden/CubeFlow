@@ -27,6 +27,7 @@ form h3 {
   text-align: left;
 }
 
+form input[type="password"],
 form input[type="text"],
 form input[type="submit"] {
   width: 100%;

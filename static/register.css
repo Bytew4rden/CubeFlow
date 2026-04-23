@@ -35,6 +35,7 @@ form p {
   color: rgb(255, 255, 255);
 }
 
+form input[type="password"],
 form input[type="text"],
 form input[type="submit"] {
   width: 100%;
