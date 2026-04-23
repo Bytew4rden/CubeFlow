@@ -15,14 +15,11 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
 app = Flask(__name__)
-
-app.secret_key = os.getenv("SECRET_KEY")
-
-db_path = "/app/data/cubeflow.db"
-
+app.secret_key = os.environ["SECRET_KEY"]
 os.makedirs("/app/data", exist_ok=True)
-
+db_path = "/app/data/cubeflow.db"
 
 createUsersTableQuery = """
 CREATE TABLE IF NOT EXISTS users
@@ -93,8 +90,9 @@ def login():
             else:
                 conn.close()
                 return redirect(url_for("login"))
-        except Exception:
-            return jsonify(error="Failed to grab data from user db")
+        except Exception as e:
+            print("Login error:", repr(e))
+            return jsonify(error=str(e))
     else:
         if session.get("logged_in") == True:
             return redirect(url_for("landing"))
