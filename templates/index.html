@@ -12,17 +12,20 @@
   <body>
     <div id="app">
       <h1>CubeFlow</h1>
+
       <div id="scramble_div">
-        <h2 id="scramble"></h2>
+        <h2>Scramble:</h2>
+        <h3 id="scramble"></h3>
         <button onclick="generateScramble()">New Scramble</button>
       </div>
 
       <div id="timer_div">
+        <h2 style="display: inline; padding-right: 10px">Time:</h2>
         <h2 id="timer">0.00</h2>
         <button id="timer_btn" onclick="toggleTimer()">Start Timer</button>
       </div>
 
-      <div id="stats">
+      <div id="tables">
         <table id="aggr_tbl">
           <tbody>
             <tr>
