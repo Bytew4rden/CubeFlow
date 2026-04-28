@@ -31,7 +31,7 @@ function generateScramble() {
   displayedScramble = String(newScramble);
   displayedScramble = displayedScramble.replace(/,/g, " ");
 
-  let scramble = document.getElementById("scramble");
+  let scramble = document.getElementById("scrambleText");
   scramble.textContent = displayedScramble;
 }
 

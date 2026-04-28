@@ -10,9 +10,9 @@ body {
 
 #scramble_div {
   padding: 5px 20px 10px 20px;
-  margin-bottom: 50px;
-  color: rgb(44, 94, 233);
+  margin-bottom: 40px;
   background-color: white;
+  color: rgb(44, 94, 233);
   max-width: 600px;
   border-radius: 10px;
 }
