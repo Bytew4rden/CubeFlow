@@ -16,21 +16,19 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
+
 app = Flask(__name__)
-
-app.secret_key = os.getenv("SECRET_KEY")
-
-db_path = "/app/data/cubeflow.db"
+app.secret_key = os.environ["SECRET_KEY"]
 
 os.makedirs("/app/data", exist_ok=True)
-
+db_path = "/app/data/cubeflow.db"
 
 createUsersTableQuery = """
 CREATE TABLE IF NOT EXISTS users
 (
 user_id INTEGER PRIMARY KEY,
 username TEXT UNIQUE NOT NULL,
-password TEXT NOT NULL
+password BLOB NOT NULL
 );
 """
 
@@ -95,6 +93,7 @@ def login():
                 conn.close()
                 return redirect(url_for("login"))
         except Exception as e:
+            print("Login error:", repr(e))
             return jsonify(error=str(e))
     else:
         if session.get("logged_in") == True:
@@ -134,8 +133,8 @@ def register():
                 conn.close()
                 print("account made")
                 return redirect(url_for("login"))
-        except Exception as e:
-            return jsonify(error=str(e))
+        except Exception:
+            return jsonify(error="Internal Server Error")
     else:
         return render_template("register.html")
 
@@ -161,8 +160,8 @@ def solve():
             cur.execute(query, (time, scramble, user_id))
             conn.commit()
             return jsonify(message="Success: Solve Recorded")
-        except Exception as e:
-            return jsonify(error=str(e))
+        except Exception:
+            return jsonify(error="Error uploading solve to DB")
         finally:
             conn.close()
 
@@ -184,8 +183,8 @@ def get_solves():
         solves = [dict(solve) for solve in cur.fetchall()]
         return jsonify(solves)
 
-    except Exception as e:
-        return jsonify(error=str(e))
+    except Exception:
+        return jsonify(error="Internal Server Error, could not get Solves")
 
     finally:
         conn.close()
@@ -205,8 +204,8 @@ def delete_solve(solveID):
         cur.execute(query, (user_id, solveID))
         conn.commit()
         return jsonify({"message": "Solve Deleted"})
-    except Exception as e:
-        return jsonify(error=str(e))
+    except Exception:
+        return jsonify(error="Internal Server Error, Could not delete Solve")
     finally:
         conn.close()
 

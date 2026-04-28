@@ -9,11 +9,17 @@ body {
 }
 
 #scramble_div {
-  padding-bottom: 50px;
+  padding: 5px 20px 10px 20px;
+  margin-bottom: 50px;
+  color: rgb(44, 94, 233);
+  background-color: white;
+  max-width: 600px;
+  border-radius: 10px;
 }
-#scramble {
-  display: inline;
-  padding-right: 20px;
+#scramble_div #scrambleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #timer_div {
@@ -26,21 +32,30 @@ body {
 
 #aggr_tbl {
   display: inline-block;
-  padding-right: 30px;
+  background-color: white;
+  color: rgb(44, 94, 233);
+  margin-right: 50px;
   vertical-align: top;
+  border-radius: 10px;
+  padding: 10px 20px 10px 5px;
 }
 
 #solves_tbl {
   display: inline-block;
-  width: 600px;
-  max-height: 300px;
+  width: 500px;
+  max-height: 250px;
   overflow-y: auto;
+  background-color: white;
+  color: rgb(44, 94, 233);
+  padding: 2px 5px 2px 5px;
+  border-radius: 10px;
 }
 #solves_tbl th {
   position: sticky;
 
   top: 0;
-  background-color: rgb(44, 94, 233);
+  background-color: white;
+  color: rgb(44, 94, 233);
 }
 #solves_tbl thead th:nth-child(2) {
   width: 450px;
@@ -50,6 +65,7 @@ body {
 }
 #solves_tbl button {
   background-color: rgb(44, 94, 233);
-  border: none;
+  margin-left: 5px;
+  border-radius: 5px;
   color: rgb(255, 255, 255);
 }
