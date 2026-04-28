@@ -9,7 +9,7 @@ body {
 }
 
 #scramble_div {
-  padding-bottom: 20px;
+  padding-bottom: 50px;
 }
 #scramble {
   display: inline;
@@ -17,7 +17,7 @@ body {
 }
 
 #timer_div {
-  padding-bottom: 20px;
+  padding-bottom: 50px;
 }
 #timer {
   display: inline;
@@ -32,13 +32,21 @@ body {
 
 #solves_tbl {
   display: inline-block;
+  width: 600px;
   max-height: 300px;
   overflow-y: auto;
 }
 #solves_tbl th {
   position: sticky;
+
   top: 0;
   background-color: rgb(44, 94, 233);
+}
+#solves_tbl thead th:nth-child(2) {
+  width: 450px;
+}
+#solves_tbl tbody td:nth-child(2) {
+  text-align: center;
 }
 #solves_tbl button {
   background-color: rgb(44, 94, 233);
