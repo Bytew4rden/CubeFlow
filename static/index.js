@@ -59,7 +59,7 @@ async function toggleTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
 
-    let scramble = document.getElementById("scramble").textContent;
+    let scramble = document.getElementById("scrambleText").textContent;
     // scramble = scramble.replace(/'/g, "i");
     // scramble = scramble.replace(/ /g, ",");
 
